@@ -2,6 +2,7 @@
 
 from random import sample
 import os
+import math
 
 #dictionary to keep track of cases (caseNo->caseValue)
 stockCases = {
@@ -58,6 +59,8 @@ def inputNumber(message):
     while True:
         try:
             userInput = int(input(message))
+            if userInput > 25 or userInput < 0 or userInput in chosenCases:
+                raise ValueError
         except ValueError:
             print("Please enter a valid number!")
             continue
@@ -68,17 +71,28 @@ def inputNumber(message):
 #function to display list in tabular form
 def displayList(listName):
     for i in range(len(listName)):
-        if listName[i] == "XX":
+        if listName[i] == 0:
             print("     XX", end = " ")
         else:
             print(f"{listName[i]:7d}", end = " ")
         if (i+1) % 5 == 0 and i != 0:
             print()
     print()
+
 #function to replace value in a list
 def replaceValue(listName, value):
     valueIndex = listName.index(value)
-    listName[valueIndex] = "XX"
+    listName[valueIndex] = 0
+
+#function to calculate root mean square
+def rms(listName):
+    tempList = [i for i in listName if i != 0]
+    sumSq = sum([i**2 for i in tempList])
+    mean = sumSq / len(tempList)
+    return math.sqrt(mean)
+
+
+chosenCases = []    #List to keep track of cases chosen
 
 #main function
 def main():
@@ -90,18 +104,18 @@ def main():
     print("Your objective is to eliminate cases with lower values and try to get the best deal!")
     print("Let's begin!")
     start = input("Would you like to start playing Deal or No Deal? (Y/N): ")
-
     while start.lower() == 'y':
         os.system('cls')
         print("Cases: ")
         displayCases(cases)
 
         number = inputNumber("Choose a case number: ")
+        if(number not in chosenCases):
+            chosenCases.append(number)
         if cases[number] >= 50000:
             print("\nOh no! The case you chose had a value of $" + str(cases[number]) + ".\n")
         else:
             print("\nHooray! The case you chose had a value of $" + str(cases[number]) + ".\n")
-        
         removeCase(cases, number)
         print("The remaining cases:")
         displayCases(cases)
@@ -110,10 +124,14 @@ def main():
         displayList(values)
 
         print("Let's see what the banker has to offer.")
+        offer = rms(values)
+        print("The banker has offered you $" + str(offer) + " to quit the game right now!")
         
-        choice = input("Do you want to continue? (Y/N): ")
-        if choice.lower() != 'y':
+        choice = input("Would you like to accept his offer? (Y/N): ")
+        if choice.lower() == 'y':
             print("Thank you for playing!")
             break
+        else:
+            print("Wise choice! Let's continue playing!")
 
 main()
