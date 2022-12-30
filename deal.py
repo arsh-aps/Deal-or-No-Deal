@@ -4,39 +4,16 @@ from random import sample
 import os
 import math
 
-#dictionary to keep track of cases (caseNo->caseValue)
-stockCases = {
-    1 : 1, 
-    2 : 3, 
-    3 : 5, 
-    4 : 10, 
-    5 : 25, 
-    6 : 50, 
-    7 : 75, 
-    8 : 100, 
-    9 : 200, 
-    10 : 300,
-    11 : 400,
-    12 : 500,
-    13 : 750,
-    14 : 1000,
-    15 : 5000,
-    16 : 10000,
-    17 : 25000,
-    18 : 50000,
-    19 : 75000,
-    20 : 100000,
-    21 : 200000,
-    22 : 350000,
-    23 : 500000,
-    24 : 750000,
-    25 : 1000000,
-    }
-
-values = list(stockCases.values())
+#Populating dictionary to keep track of cases (caseNo->caseValue) from a file
+f = open("amount.txt")
+line = f.read()
+amountList = [int(amount) for amount in line.split(',')]    #List that keeps tracks of the amount in the cases
+indexList = list(range(1,26))
+stockCases = dict(zip(indexList, amountList))
+f.close()
 
 #shuffling the values of the cases
-cases = dict(zip(stockCases, sample(values, len(stockCases))))
+cases = dict(zip(stockCases, sample(amountList, len(stockCases))))
 
 #function to print cases in tabular form
 def displayCases(caseDict):
@@ -44,14 +21,14 @@ def displayCases(caseDict):
         if value == "XX":
             print("XX", end = " ")
         else:
-            print(f"{key:2d}", end = " ")
+            #print(f"{key:2d}", end = " ")
+            print(str(key).ljust(2,' '), end = " ")
         if key % 5 == 0:
             print()
 
 #function to remove chose case
 def removeCase(caseDict, number):
-    #values.remove(caseDict[number])
-    replaceValue(values, caseDict[number])
+    replaceValue(amountList, caseDict[number])
     caseDict[number] = "XX"
 
 #function to accept number from user
@@ -72,9 +49,10 @@ def inputNumber(message):
 def displayList(listName):
     for i in range(len(listName)):
         if listName[i] == 0:
-            print("     XX", end = " ")
+            print("XX".ljust(7,' '), end = " ")
         else:
-            print(f"{listName[i]:7d}", end = " ")
+            #print(f"{listName[i]:7d}", end = " ")\
+            print(str(listName[i]).ljust(7,' '), end = " ")
         if (i+1) % 5 == 0 and i != 0:
             print()
     print()
@@ -100,7 +78,7 @@ def main():
     print("Here are the cases")
     displayCases(cases)
     print("These cash amounts are hidden in these cases randomly")
-    displayList(values)
+    displayList(amountList)
     print("Your objective is to eliminate cases with lower values and try to get the best deal!")
     print("Let's begin!")
     start = input("Would you like to start playing Deal or No Deal? (Y/N): ")
@@ -121,10 +99,10 @@ def main():
         displayCases(cases)
 
         print("\nThe remaining values: ")
-        displayList(values)
+        displayList(amountList)
 
         print("Let's see what the banker has to offer.")
-        offer = rms(values)
+        offer = rms(amountList)
         print("The banker has offered you $" + str(offer) + " to quit the game right now!")
         
         choice = input("Would you like to accept his offer? (Y/N): ")
